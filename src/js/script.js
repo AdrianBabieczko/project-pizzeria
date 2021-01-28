@@ -92,6 +92,7 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
     }
 
     initAccordion(){
@@ -155,18 +156,38 @@
           //determine option valie, e.g. optionId = 'olives', option = {label: 'Olives', price: 2, default: true}
           const option = param.options[optionId];
 
-          // check if optionId of paramId is selected in formData
+          const optionSelectetd = formData[paramId] && formData[paramId].includes(optionId);
 
-          if(formData[paramId] && formData[paramId].includes(optionId)){
+          //find img with specific class
+          const img = thisProduct.imageWrapper.querySelector('.' + paramId + '-' + optionId);
+
+          if(img) 
+          {
+            if(optionSelectetd)
+            {
+              img.classList.add(classNames.menuProduct.imageVisible);
+            }
+            else
+            {
+              img.classList.remove(classNames.menuProduct.imageVisible);
+            }
+          }
+          
+          // check if optionId of paramId is selected in formData
+          if(optionSelectetd)
+          {
             // check if the option is not default
-            if(!option['default']) {
+            if(!option['default']) 
+            {
               //add option price to price variable
               price += option['price'];
             }
           }
-          else {
+          else 
+          {
             //check if the option is default
-            if(option['default']){
+            if(option['default'])
+            {
               //reduce price variable
               price -= option['price'];
             }
