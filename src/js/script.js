@@ -171,6 +171,7 @@
       thisProduct.dom.cartButton.addEventListener('click', function(event){
         event.preventDefault();
         thisProduct.processOrder();
+        thisProduct.addToCart();
       });
     }
 
@@ -232,6 +233,8 @@
         }
       }
 
+      thisProduct.priceSingle = price;
+
       //multiply price by product quantity
       price *= thisProduct.amountWidget.value;
 
@@ -248,6 +251,67 @@
       thisProduct.dom.amountWidgetElem.addEventListener('updated', function(){
         thisProduct.processOrder();
       });
+    }
+
+    addToCart()
+    {
+      const thisProduct = this;
+
+      app.cart.add(thisProduct.prepareCartProduct());
+    }
+
+    prepareCartProduct()
+    {
+      const thisProduct = this;
+
+      const productSummary = 
+      {
+        id: thisProduct.id,
+        name: thisProduct.data.name,
+        amount: thisProduct.amountWidget.value,
+        priceSingle: thisProduct.priceSingle,
+        price: thisProduct.priceSingle * thisProduct.amountWidget.value,
+        params: thisProduct.prepareCartProductParams()
+      };
+
+      return productSummary;
+    }
+
+    prepareCartProductParams()
+    {
+      const thisProduct = this;
+
+      const productParams = {};
+      
+      // covert form to object structure e.g. { sauce: ['tomato'], toppings: ['olives', 'redPeppers']}
+      const formData = utils.serializeFormToObject(thisProduct.dom.form);
+
+      // for every category (param) ...
+      for(let paramId in thisProduct.data.params){
+        // determine param value, e.g. paramId = 'topping', param = {label: 'Toppings', type: 'checkboxes'...}
+        const param = thisProduct.data.params[paramId];
+
+        productParams[paramId]= {
+          label: param.label,
+          options: {}
+        };
+
+        // for every option in this category
+        for(let optionId in param.options) {
+          //determine option valie, e.g. optionId = 'olives', option = {label: 'Olives', price: 2, default: true}
+          const option = param.options[optionId];
+
+          const optionSelectetd = formData[paramId] && formData[paramId].includes(optionId);
+
+          // check if optionId of paramId is selected in formData
+          if(optionSelectetd)
+          {
+            productParams[paramId].options[optionId] = option.label;
+          }          
+        }
+      }
+
+      return productParams;
     }
   }
 
@@ -353,6 +417,13 @@
 
         thisCart.dom.wrapper.classList.toggle(classNames.cart.wrapperActive);
       });
+    }
+
+    add(menuProduct) 
+    {
+      const thisCart = this;
+
+      console.log('adding product', menuProduct);
     }
   }
 
