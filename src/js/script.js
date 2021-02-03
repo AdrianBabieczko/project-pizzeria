@@ -37,9 +37,10 @@
       productList: '.cart__order-summary',
       toggleTrigger: '.cart__summary',
       totalNumber: `.cart__total-number`,
-      totalPrice: '.cart__total-price strong, .cart__order-total .cart__order-price-sum strong',
+      totalPrice: '.cart__total-price strong',
       subtotalPrice: '.cart__order-subtotal .cart__order-price-sum strong',
       deliveryFee: '.cart__order-delivery .cart__order-price-sum strong',
+      totalSpan: '.cart__order-total .cart__order-price-sum strong',
       form: '.cart__order',
       formSubmit: '.cart__order [type="submit"]',
       phone: '[name="phone"]',
@@ -248,7 +249,7 @@
 
       thisProduct.amountWidget = new AmountWidget(thisProduct.dom.amountWidgetElem);
 
-      thisProduct.dom.amountWidgetElem.addEventListener('updated', function(){
+      thisProduct.dom.amountWidgetElem.addEventListener('update', function(){
         thisProduct.processOrder();
       });
     }
@@ -411,6 +412,7 @@
       thisCart.dom.deliveryFee = document.querySelector(select.cart.deliveryFee);
       thisCart.dom.subTotalPrice = document.querySelector(select.cart.subtotalPrice);
       thisCart.dom.totalPrice = document.querySelector(select.cart.totalPrice);
+      thisCart.dom.totalSpan = document.querySelector(select.cart.totalSpan);
       thisCart.dom.totalNumber = document.querySelector(select.cart.totalNumber);
     }
 
@@ -470,8 +472,9 @@
 
       thisCart.dom.deliveryFee.innerHTML = deliveryFee;
       thisCart.dom.subTotalPrice.innerHTML = subtotalPrice;
-      thisCart.dom.totalPrice.innerHTML = thisCart.totalPrice;
+      thisCart.dom.totalPrice.innerHTML = subtotalPrice + deliveryFee;
       thisCart.dom.totalNumber.innerHTML = totalNumber;
+      thisCart.dom.totalSpan.innerHTML = subtotalPrice + deliveryFee;
     }
   }
 
@@ -506,18 +509,19 @@
       thisCartProduct.dom.remove = element.querySelector(select.remove);
     }
 
-    initAmountWidget()
+    initAmountWidget() 
+    {
+      const thisCartProduct = this;
+      thisCartProduct.dom.amountWidget.addEventListener('update', thisCartProduct.update);
+    }
+
+    update() 
     {
       const thisCartProduct = this;
 
-      thisCartProduct.amountWidget = new AmountWidget(thisCartProduct.dom.amountWidget);
-
-      thisCartProduct.dom.amountWidget.addEventListener('updated', function()
-      {
-        thisCartProduct.amount = thisCartProduct.amountWidget.value;
-        thisCartProduct.price = thisCartProduct.priceSingle * thisCartProduct.amount;
-        thisCartProduct.dom.price.innerHTML = thisCartProduct.price;
-      });
+      thisCartProduct.amount =this.amountWidget.value;
+      thisCartProduct.price =this.priceSingle * this.amount;
+      thisCartProduct.dom.price.innerHTML =this.price;
     }
   }
 
