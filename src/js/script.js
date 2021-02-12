@@ -78,6 +78,11 @@
       defaultDeliveryFee: 20,
     },
     // CODE ADDED END
+    db: {
+      url: '//localhost:3131',
+      product: 'product',
+      order: 'order',
+    },
   };
   
   const templates = {
@@ -493,6 +498,7 @@
 
       thisCartProduct.getElements(element);
       thisCartProduct.initAmountWidget();
+      thisCartProduct.initActions();
     }
 
     getElements(element)
@@ -523,6 +529,45 @@
       thisCartProduct.price =this.priceSingle * this.amount;
       thisCartProduct.dom.price.innerHTML =this.price;
     }
+
+    remove()
+    {
+      const thisCartProduct = this;
+
+      const event = new CustomEvent('remove',
+        {
+          bubbles: true,
+          detail: {
+            cartProduct: thisCartProduct,
+          },
+        });
+
+      thisCartProduct.dom.wrapper.dispatchEvent(event);
+
+      console.log('removed');
+    }
+
+    initActions()
+    {
+      const thisCartProduct = this;
+
+      if(thisCartProduct.dom.edit)
+      {
+        thisCartProduct.dom.edit.addEventListener('click', function(event) {
+          event.preventDefault();
+        });
+      }
+
+      if(thisCartProduct.dom.remove)
+      {
+        thisCartProduct.dom.remove.addEventListener('click', function(event) {
+        
+          event.preventDefault();
+  
+          thisCartProduct.remove();
+        });
+      }
+    }
   }
 
   const app = 
@@ -540,7 +585,24 @@
     {
       const thisApp = this;
 
-      thisApp.data = dataSource;
+      thisApp.data = {};
+
+      const url = settings.db.url + '/' + settings.db.product;
+
+      fetch(url)
+        .then(function(rawResponse){
+          return rawResponse.json();
+        })
+        .then(function(parsedResponse){
+          console.log('parsedResponse', parsedResponse);
+
+          // save parsedResponse as thisApp.data.products
+
+          // execute initMenu method
+
+        });
+
+      console.log('thisApp.data', JSON.stringify(thisApp.data));
     },
 
     initMenu: function()
@@ -549,7 +611,7 @@
 
       for (const productData in thisApp.data.products) 
       {
-        new Product(productData, thisApp.data.products[productData]);
+        new Product(thisApp.data.products[productData].id, thisApp.data.products[productData]);
       }
     },
 
