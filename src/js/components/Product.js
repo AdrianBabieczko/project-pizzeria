@@ -1,3 +1,7 @@
+import {select, classNames, templates} from '../settings.js';
+import utils from '../utils.js';
+import AmountWidget from './AmountWidget.js';
+
 class Product 
 {
   constructor(id, data) {
@@ -170,7 +174,18 @@ class Product
   {
     const thisProduct = this;
 
-    app.cart.add(thisProduct.prepareCartProduct());
+    thisProduct.product = thisProduct.prepareCartProduct();
+
+    // app.cart.add(thisProduct.product);
+
+    const event = new CustomEvent('add-to-cart', {
+      bubbles: true,
+      detail: {
+        product: thisProduct.product,
+      },
+    });
+
+    thisProduct.element.dispatchEvent(event);
   }
 
   prepareCartProduct()

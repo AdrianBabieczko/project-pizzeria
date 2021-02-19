@@ -1,3 +1,5 @@
+import {select} from '../settings.js';
+
 class CartProduct 
 {
   constructor(menuProduct, element)
@@ -99,3 +101,5 @@ class CartProduct
     return product;
   }
 }
+
+export default CartProduct;
