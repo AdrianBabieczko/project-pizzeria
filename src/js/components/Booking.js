@@ -1,4 +1,4 @@
-// import {settings, select} from '../settings.js';
+ import {templates} from '../settings.js';
 
 class Booking
 {
@@ -14,7 +14,15 @@ class Booking
   {
     const thisBooking = this;
 
-    console.log(element, thisBooking);
+    const generatedHTML = templates.bookingWidget();
+
+    thisBooking.dom = {};
+
+    thisBooking.dom.wrapper = element;
+
+    thisBooking.dom.wrapper.innerHTML = generatedHTML;
+
+    console.log(thisBooking.dom.wrapper);
   }
 
   initWidgets()

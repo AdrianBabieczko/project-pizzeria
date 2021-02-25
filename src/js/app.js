@@ -121,8 +121,6 @@ const app =
       const bookingElement = document.querySelector(select.containerOf.booking);
 
       const booking = new Booking(bookingElement);
-
-      console.log(booking);
     },
   };
 
