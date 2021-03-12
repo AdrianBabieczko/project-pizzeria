@@ -122,7 +122,7 @@ const app =
 
       const booking = new Booking(bookingElement);
 
-      console.log(booking);
+      //console.log(booking);
     },
   };
 
