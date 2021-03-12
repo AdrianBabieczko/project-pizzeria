@@ -13,6 +13,8 @@ class Booking
     thisBooking.render(element);
     thisBooking.initWidgets();
     thisBooking.getData();
+
+    thisBooking.selectedTableNumber;
   }
 
   getData(){
@@ -128,10 +130,7 @@ class Booking
     }
 
     for(let table of thisBooking.dom.tables){
-      let tableId = table.getAttribute(settings.booking.tableIdAttribute);
-      if(!isNaN(tableId)){
-        tableId = parseInt(tableId);
-      }
+      let tableId = this.parseTableId(table);
 
       if(!allAvailable && thisBooking.booked[thisBooking.date][thisBooking.hour].includes(tableId)){
         table.classList.add(classNames.booking.tableBooked);
@@ -139,7 +138,17 @@ class Booking
         table.classList.remove(classNames.booking.tableBooked);
       }
     }
+
+    thisBooking.resetSelectedTables();
   }  
+
+  parseTableId(table) {
+    let tableId = table.getAttribute(settings.booking.tableIdAttribute);
+    if (!isNaN(tableId)) {
+      tableId = parseInt(tableId);
+    }
+    return tableId;
+  }
 
   render(wrapper)
   {
@@ -176,6 +185,12 @@ class Booking
       thisBooking.updateDOM();
     });
 
+    for(let table of thisBooking.dom.tables){
+      table.addEventListener('click', function(){
+        thisBooking.initTables(table);
+      });
+    }
+
     thisBooking.dom.peopleAmount.addEventListener('update', function(){
     });
 
@@ -187,8 +202,42 @@ class Booking
 
     thisBooking.dom.time.addEventListener('update', function(){
     });
+  }
 
-    
+  initTables(table){
+    const thisBooking = this;
+
+    const tableId = thisBooking.parseTableId(table);
+
+    if(!table.classList.contains(classNames.booking.tableBooked)){
+      if(thisBooking.selectedTableNumber != 'undefined' && thisBooking.selectedTableNumber == tableId){
+        table.classList.toggle(classNames.booking.selected);
+      } else {
+        const selectedTable = thisBooking.dom.wrapper.getElementsByClassName(classNames.booking.selected);
+
+        if(selectedTable.length > 0){
+          selectedTable[0].classList.toggle(classNames.booking.selected);
+        }
+
+        thisBooking.selectedTableNumber = tableId;
+        table.classList.toggle(classNames.booking.selected);
+      }
+    } else {
+      alert('Table is booked already');
+    }
+  }
+
+
+  resetSelectedTables(){
+    const thisBooking = this;
+
+    const selectedTable = thisBooking.dom.wrapper.getElementsByClassName(classNames.booking.selected);
+    if(selectedTable.length > 0){
+      if(selectedTable[0].classList.contains(classNames.booking.selected)){
+        selectedTable[0].classList.remove(classNames.booking.selected);
+        thisBooking.selectedTableNumber = null;
+      }
+    }
   }
 }
 
