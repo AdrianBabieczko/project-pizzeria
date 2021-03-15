@@ -14,7 +14,8 @@ class Booking
     thisBooking.initWidgets();
     thisBooking.getData();
 
-    thisBooking.selectedTableNumber;
+    thisBooking.selectedTableNumber = null;
+    thisBooking.starters = [];
   }
 
   getData(){
@@ -191,17 +192,60 @@ class Booking
       });
     }
 
-    thisBooking.dom.peopleAmount.addEventListener('update', function(){
-    });
+    const bookTableButton = thisBooking.dom.wrapper.getElementsByClassName('btn-secondary');
+    bookTableButton[0].addEventListener('click', function(event){
+      event.preventDefault();
 
-    thisBooking.dom.hoursAmount.addEventListener('update', function(){
+      thisBooking.sendBooking();
     });
+  }
 
-    thisBooking.dom.date.addEventListener('update', function(){
-    });
+  sendBooking(){
+    const thisBooking = this;
 
-    thisBooking.dom.time.addEventListener('update', function(){
-    });
+    const url = settings.db.url + '/' + settings.db.booking;
+
+    thisBooking.dom.phone = document.querySelector(select.booking.phone);
+    thisBooking.dom.address = document.querySelector(select.booking.address);
+
+    thisBooking.dom.starterWater = document.querySelector(select.booking.starterWater);
+    thisBooking.dom.starterBread = document.querySelector(select.booking.starterBread);
+
+    let payload = {
+      date: thisBooking.dateWidget.correctValue,
+      hour: thisBooking.timeWidget.correctValue,
+      table: thisBooking.selectedTableNumber,
+      duration: thisBooking.hoursAmountWidget.correctValue,
+      ppl: thisBooking.peopleAmountWidget.correctValue,
+      starters: [],
+      phone: thisBooking.dom.phone.value,
+      address: thisBooking.dom.address.value,
+    };
+
+    if(thisBooking.dom.starterBread.checked == true){
+      thisBooking.starters.push(thisBooking.dom.starterWater.value);
+      thisBooking.starters.push(thisBooking.dom.starterBread.value);
+    } else if(thisBooking.dom.starterWater.checked == true){
+      thisBooking.starters.push(thisBooking.dom.starterWater.value);
+    }
+
+    payload.starters = thisBooking.starters;
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    };
+
+    fetch(url, options)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(parsedResponse){
+        thisBooking.makeBooked(parsedResponse.date, parsedResponse.hour, parsedResponse.duration, parsedResponse.table);
+      });
   }
 
   initTables(table){
